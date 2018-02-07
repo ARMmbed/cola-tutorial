@@ -127,6 +127,11 @@ int main_application(void)
     // Save pointer to mbedClient so that other functions can access it.
     client = &mbedClient;
 
+#ifdef MBED_HEAP_STATS_ENABLED
+    printf("Client initialized\r\n");
+    heap_stats();
+#endif
+
     // Create resource for button count. Path of this resource will be: 3200/0/5501.
     button_res = mbedClient.add_cloud_resource(3200, 0, 5501, "button_resource", M2MResourceInstance::INTEGER,
                               M2MBase::GET_ALLOWED, 0, true, NULL, (void*)button_notification_status_callback);

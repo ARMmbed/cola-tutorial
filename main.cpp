@@ -30,12 +30,13 @@ int main()
 }
 
 // Pointers to the resources that will be created in main_application().
-static M2MResource* button_res;
-static M2MResource* pattern_res;
-static M2MResource* blink_res;
+static M2MResource* product_id;
+static M2MResource* product_current_count;
+static M2MResource* product_empty;
 
 // Pointer to mbedClient, used for calling close function.
 static SimpleM2MClient *client;
+
 
 void pattern_updated(const char *)
  {
@@ -114,6 +115,9 @@ void factory_reset(void *)
 
 int main_application(void)
 {
+    const int max_cnt = ((rand() % 3) + 1) * 10; //10, 20, 30 possible in stock on this row
+    const float sale_prob = rand();
+
     // IOTMORF-1712: DAPLINK starts the previous application during flashing a new binary
     // This is workaround to prevent possible deletion of credentials or storage corruption
     // while replacing the application binary.
@@ -132,17 +136,18 @@ int main_application(void)
     heap_stats();
 #endif
 
-    // Create resource for button count. Path of this resource will be: 3200/0/5501.
-    button_res = mbedClient.add_cloud_resource(3200, 0, 5501, "button_resource", M2MResourceInstance::INTEGER,
-                              M2MBase::GET_ALLOWED, 0, true, NULL, (void*)button_notification_status_callback);
+//    static M2MResource* product_id;
+//    static M2MResource* product_current_count;
+//    static M2MResource* product_empty;
 
-    // Create resource for led blinking pattern. Path of this resource will be: 3201/0/5853.
-    pattern_res = mbedClient.add_cloud_resource(3201, 0, 5853, "pattern_resource", M2MResourceInstance::STRING,
-                               M2MBase::GET_PUT_ALLOWED, "500:500:500:500", false, (void*)pattern_updated, NULL);
+    product_id = mbedClient.add_cloud_resource(10341, 0, 26341, "product_id", M2MResourceInstance::INTEGER,
+                              M2MBase::GET_ALLOWED, 0, false, NULL, NULL)
 
-    // Create resource for starting the led blinking. Path of this resource will be: 3201/0/5850.
-    blink_res = mbedClient.add_cloud_resource(3201, 0, 5850, "blink_resource", M2MResourceInstance::STRING,
-                             M2MBase::POST_ALLOWED, "", false, (void*)blink_callback, NULL);
+    product_current_count = mbedClient.add_cloud_resource(10341, 0, 26342, "product_id", M2MResourceInstance::INTEGER,
+                              M2MBase::GET_ALLOWED, 0, true, NULL, NULL)
+
+    product_empty = mbedClient.add_cloud_resource(10341, 0, 26343, "product_id", M2MResourceInstance::INTEGER,
+                              M2MBase::GET_ALLOWED, 0, true, NULL, NULL)
 
     // Create resource for unregistering the device. Path of this resource will be: 5000/0/1.
     mbedClient.add_cloud_resource(5000, 0, 1, "unregister", M2MResourceInstance::STRING,
@@ -158,12 +163,29 @@ int main_application(void)
 
     mbedClient.register_and_connect();
 
+    // Set a product ID
+    product_id->set_value(rand() % 5); // 5 possible products
+    product_current_count->set_value(max_cnt);
+
     // Check if client is registering or registered, if true sleep and repeat.
     while (mbedClient.is_register_called()) {
-        static int button_count = 0;
-        do_wait(100);
-        if (button_clicked()) {
-            button_res->set_value(++button_count);
+        int cnt_down = (rand() % 9900) + 100; // Random wait between 100 ms and 10s
+        do_wait(cnt_down);
+
+        if (product_empty->get_value() == 1) {
+            do_wait(10000);
+            product_empty->set_value(0);
+        }
+        product_current_count->set_value(product_current_count->get_value() - 1);
+        //Sold
+        if(rand() < sale_prob){}
+        else{
+            do_wait(1000);
+            product_current_count->set_value(product_current_count->get_value() + 1);
+        }
+
+        if(product_current_count->get_value() == 0){
+            product_empty->set_value(1);
         }
     }
 

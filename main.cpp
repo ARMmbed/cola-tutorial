@@ -42,26 +42,6 @@ static M2MResource* product_empty;
 // Pointer to mbedClient, used for calling close function.
 static SimpleM2MClient *client;
 
-
-void pattern_updated(const char *)
-{
-    printf("PUT received, new value: %s\n", pattern_res->get_value_string().c_str());
-}
-
-void blink_callback(void *)
-{
-    String pattern_string = pattern_res->get_value_string();
-    const char *pattern = pattern_string.c_str();
-    printf("LED pattern = %s\n", pattern);
-
-    // The pattern is something like 500:200:500, so parse that.
-    // LED blinking is done while parsing.
-    const bool restart_pattern = false;
-    if (blinky.start((char*)pattern_res->value(), pattern_res->value_length(), restart_pattern) == false) {
-        printf("out of memory error\n");
-    }
-}
-
 void button_notification_status_callback(const M2MBase& object, const NoticationDeliveryStatus status)
 {
     switch(status) {
@@ -174,10 +154,10 @@ void main_application(void)
     product_id = mbedClient.add_cloud_resource(10341, 0, 26341, "product_id", M2MResourceInstance::INTEGER,
                               M2MBase::GET_ALLOWED, 0, false, NULL, NULL)
 
-    product_current_count = mbedClient.add_cloud_resource(10341, 0, 26342, "product_id", M2MResourceInstance::INTEGER,
+    product_current_count = mbedClient.add_cloud_resource(10341, 0, 26342, "product_current_count", M2MResourceInstance::INTEGER,
                               M2MBase::GET_ALLOWED, 0, true, NULL, NULL)
 
-    product_empty = mbedClient.add_cloud_resource(10341, 0, 26343, "product_id", M2MResourceInstance::INTEGER,
+    product_empty = mbedClient.add_cloud_resource(10341, 0, 26343, "product_empty", M2MResourceInstance::INTEGER,
                               M2MBase::GET_ALLOWED, 0, true, NULL, NULL)
 
     // Create resource for unregistering the device. Path of this resource will be: 5000/0/1.

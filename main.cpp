@@ -114,13 +114,13 @@ int main_application(void)
 //    static M2MResource* product_empty;
 
     product_id = mbedClient.add_cloud_resource(10341, 0, 26341, "product_id", M2MResourceInstance::INTEGER,
-                              M2MBase::GET_ALLOWED, 0, false, NULL, NULL)
+                              M2MBase::GET_ALLOWED, 0, false, NULL, NULL);
 
     product_current_count = mbedClient.add_cloud_resource(10341, 0, 26342, "product_current_count", M2MResourceInstance::INTEGER,
-                              M2MBase::GET_ALLOWED, 0, true, NULL, NULL)
+                              M2MBase::GET_ALLOWED, 0, true, NULL, NULL);
 
     product_empty = mbedClient.add_cloud_resource(10341, 0, 26343, "product_empty", M2MResourceInstance::INTEGER,
-                              M2MBase::GET_ALLOWED, 0, true, NULL, NULL)
+                              M2MBase::GET_ALLOWED, 0, true, NULL, NULL);
 
     // Create resource for unregistering the device. Path of this resource will be: 5000/0/1.
     mbedClient.add_cloud_resource(5000, 0, 1, "unregister", M2MResourceInstance::STRING,
@@ -145,19 +145,19 @@ int main_application(void)
         int cnt_down = (rand() % 9900) + 100; // Random wait between 100 ms and 10s
         do_wait(cnt_down);
 
-        if (product_empty->get_value() == 1) {
+        if (product_empty->get_value_int() == 1) {
             do_wait(10000);
             product_empty->set_value(0);
         }
-        product_current_count->set_value(product_current_count->get_value() - 1);
+        product_current_count->set_value(product_current_count->get_value_int() - 1);
         //Sold
         if(rand() < sale_prob){}
         else{
             do_wait(1000);
-            product_current_count->set_value(product_current_count->get_value() + 1);
+            product_current_count->set_value(product_current_count->get_value_int() + 1);
         }
 
-        if(product_current_count->get_value() == 0){
+        if(product_current_count->get_value_int() == 0){
             product_empty->set_value(1);
         }
     }

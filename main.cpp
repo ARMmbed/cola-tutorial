@@ -93,8 +93,9 @@ void factory_reset(void *)
 
 void main_application(void)
 {
-    const int max_cnt = ((rand() % 3) + 1) * 10; //10, 20, 30 possible in stock on this row
-    const float sale_prob = rand();
+    //srand(time(0));
+    const unsigned int max_cnt = ((rand() % 3) + 1) * 10; //10, 20, 30 possible in stock on this row
+    const int sale_prob = rand();
 
     // IOTMORF-1712: DAPLINK starts the previous application during flashing a new binary
     // This is workaround to prevent possible deletion of credentials or storage corruption
@@ -179,8 +180,9 @@ void main_application(void)
         int cnt_down = (rand() % 9900) + 100; // Random wait between 100 ms and 10s
         mcc_platform_do_wait(cnt_down);
 
-        if (product_empty->get_value() == 1) {
+        if (product_empty->get_value_int() == 1) {
             mcc_platform_do_wait(10000);
+            product_current_count->set_value(max_cnt); // Restock
             product_empty->set_value(0);
         }
         product_current_count->set_value(product_current_count->get_value_int() - 1);

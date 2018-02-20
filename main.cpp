@@ -88,7 +88,7 @@ void factory_reset(void *)
 
 int main_application(void)
 {
-    //srand(time(0));
+    srand(time(NULL));
     const unsigned int max_cnt = ((rand() % 3) + 1) * 10; //10, 20, 30 possible in stock on this row
     const int sale_prob = rand();
 

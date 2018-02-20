@@ -88,9 +88,6 @@ void factory_reset(void *)
 
 int main_application(void)
 {
-    srand(time(NULL));
-    const unsigned int max_cnt = ((rand() % 3) + 1) * 10; //10, 20, 30 possible in stock on this row
-    const int sale_prob = rand();
 
     // IOTMORF-1712: DAPLINK starts the previous application during flashing a new binary
     // This is workaround to prevent possible deletion of credentials or storage corruption
@@ -136,10 +133,18 @@ int main_application(void)
     print_to_screen(0, 3, "Cloud Client: Connecting");
 
     mbedClient.register_and_connect();
+    //while(!mbedClient.is_client_registered()){}
+    printf("Setting srand %d\n\r", mbedClient.get_unique_id());
+
+    srand(mbedClient.get_unique_id());
+    unsigned int max_cnt = ((rand() % 3) + 1) * 10; //10, 20, 30 possible in stock on this row
+    int sale_prob = rand();
 
     // Set a product ID
     product_id->set_value(rand() % 5); // 5 possible products
     product_current_count->set_value(max_cnt);
+
+    printf("Starting simulation\n\r");
 
     // Check if client is registering or registered, if true sleep and repeat.
     while (mbedClient.is_register_called()) {

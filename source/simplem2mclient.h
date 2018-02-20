@@ -106,6 +106,8 @@ public:
                 printf("Endpoint Name: %s\r\n", endpoint->endpoint_name.c_str());
 #endif
                 printf("Device Id: %s\r\n", endpoint->internal_endpoint_name.c_str());
+
+                _unique_id = get_sum(endpoint->internal_endpoint_name.c_str());
             }
         }
 #ifdef MBED_HEAP_STATS_ENABLED
@@ -248,11 +250,26 @@ public:
                       allowed, value, observable, cb, notification_status_cb);
     }
 
+    uint32_t get_unique_id() const {
+        return _unique_id;
+    }
+
+private:
+    uint32_t get_sum(const char* cstr){
+        uint32_t cnt = 0;
+        int i = 0;
+        while(cstr[i] != '\0'){
+            cnt += cstr[i++];
+        }
+        return cnt;
+    }
+
 private:
     M2MObjectList       _obj_list;
     MbedCloudClient     _cloud_client;
     bool                _registered;
     bool                _register_called;
+    uint32_t            _unique_id;
 
 };
 

@@ -21,6 +21,14 @@
 #include "mbed.h"
 #endif
 
+const char* product_strings[] = {
+    "Apples",
+    "Cheese",
+    "Milk",
+    "Bread",
+    "Beer"
+};
+
 static int main_application(void);
 
 int main()
@@ -111,7 +119,7 @@ int main_application(void)
 //    static M2MResource* product_current_count;
 //    static M2MResource* product_empty;
 
-    product_id = mbedClient.add_cloud_resource(10341, 0, 26341, "product_id", M2MResourceInstance::INTEGER,
+    product_id = mbedClient.add_cloud_resource(10341, 0, 26341, "product_id", M2MResourceInstance::STRING,
                               M2MBase::GET_ALLOWED, 0, false, NULL, NULL);
 
     product_current_count = mbedClient.add_cloud_resource(10341, 0, 26342, "product_current_count", M2MResourceInstance::INTEGER,
@@ -141,7 +149,8 @@ int main_application(void)
     int sale_prob = rand();
 
     // Set a product ID
-    product_id->set_value(rand() % 5); // 5 possible products
+    const char* product_string = product_strings[rand() % 5];
+    product_id->set_value((const uint8_t*)product_string, strlen(product_string)); // 5 possible products
     product_current_count->set_value(max_cnt);
 
     printf("Starting simulation\n\r");

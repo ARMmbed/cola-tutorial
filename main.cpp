@@ -171,7 +171,9 @@ void main_application(void)
                  M2MBase::POST_ALLOWED, NULL, false, (void*)factory_reset, NULL);
 
     mbedClient.register_and_connect();
-    //while(!mbedClient.is_client_registered()){}
+    while(!mbedClient.is_client_registered()){
+        mcc_platform_do_wait(1000);
+    }
     printf("Setting srand %d\n\r", mbedClient.get_unique_id());
 
     srand(mbedClient.get_unique_id());

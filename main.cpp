@@ -31,7 +31,7 @@ const char* product_strings[] = {
     "Bread",
     "Beer"
 };
-static int main_application(void);
+static void main_application(void);
 
 int main(void)
 {
@@ -95,7 +95,7 @@ void factory_reset(void *)
     }
 }
 
-int main_application(void)
+void main_application(void)
 {
 
     // IOTMORF-1712: DAPLINK starts the previous application during flashing a new binary
